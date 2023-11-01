@@ -19,9 +19,9 @@ const userRoutes = require('./routes/users');
 const campgroundRoutes = require('./routes/campgrounds');
 const reviewRoutes = require('./routes/reviews');
 
-const MongoDBStore = require("connect-mongo")(session);
+const MongoStore = require("connect-mongo")(session);
 
-const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp';
+const dbUrl = process.env.DB_URL || 'mongodb://127.0.0.1:27017/yelpcampingmood';
 
 mongoose.connect(dbUrl, {
     useNewUrlParser: true,
@@ -50,10 +50,12 @@ app.use(mongoSanitize({
 }))
 const secret = process.env.SECRET || 'thisshouldbeabettersecret!';
 
-const store = new MongoDBStore({
-    url: dbUrl,
-    secret,
-    touchAfter: 24 * 60 * 60
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    touchAfter: 24 * 60 * 60,
+    crypto: {
+        secret: 'thisshouldbeabettersecret!'
+    }
 });
 
 store.on("error", function (e) {
@@ -96,9 +98,10 @@ const styleSrcUrls = [
     "https://use.fontawesome.com",
 ];
 const connectSrcUrls = [
-    "https://api.mapbox.com",
-    "https://*.tiles.mapbox.com",
-    "https://events.mapbox.com",
+    "https://api.mapbox.com/",
+    "https://a.tiles.mapbox.com/",
+    "https://b.tiles.mapbox.com/",
+    "https://events.mapbox.com/",
 ];
 const fontSrcUrls = [];
 app.use(
@@ -115,7 +118,7 @@ app.use(
                 "'self'",
                 "blob:",
                 "data:",
-                "https://res.cloudinary.com/douqbebwk/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
+                "https://res.cloudinary.com/dabkorgcr/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
                 "https://images.unsplash.com",
             ],
             fontSrc: ["'self'", ...fontSrcUrls],
